@@ -1,0 +1,145 @@
+#!/bin/python3
+
+# Imports
+
+import os
+from sys import argv as ar
+
+# Variables
+
+compiler = 'gcc'
+source = 'main.c'
+output = 'main'
+
+temp = []
+
+msg = True
+
+i = 0
+
+# Program code
+
+ar.pop(0)
+
+if len(ar) == 0:
+
+    if not os.path.exists("make.fmake"):
+ 
+        print("No make.fmake file found, quit it.")
+        exit()
+
+if len(ar) == 0:
+    
+        # Proceed with making
+        
+        f = open("make.fmake", "r")
+        
+        for line in f:
+            temp.append(line)
+        
+        f.close()
+
+        while i < len(temp):
+            
+            # It saves so much time
+
+            doc = temp[i].split()
+
+            if temp[i].split() == []:
+                pass
+
+            # I'm more of a gcc guy, rather than clang, that's why it's the default
+            
+            elif doc[0] == 'cc':
+                if doc[1] == '=':
+                    compiler = doc[2]
+                elif doc[1] == '$':
+                    compiler = 'gcc'
+            
+            # I can't just assume you're gonna name the file main.c
+
+            elif doc[0] == 'src':
+                if doc[1] == '=':
+                    source = doc[2]
+                elif doc[1] == '$':
+                    source = 'main.c'
+            
+            # In case you want to rename the output file
+
+            elif doc[0] == 'target':
+                if doc[1] == '=':
+                    output = doc[2]
+                elif doc[1] == '$':
+                    output = 'main'
+
+            # It's that "Done!" message it displays
+
+            elif doc[0] == 'msg':
+                if doc[1] == '=':
+                    if doc[2].lower() == "true":
+                        msg = True
+                    elif doc[2].lower() == "false":
+                        msg = False
+                elif doc[1] == '$':
+                    msg = True
+
+            i += 1
+
+        # The actual compiling
+
+        os.system(f"{compiler} {source} -o {output}")
+        
+        if msg:
+            print("Done!")
+        exit()
+
+else:
+    
+    if ar[0] == "clean":
+        
+        if os.path.exists("make.fmake"):
+            f = open("make.fmake","r")
+        else:
+            print("No make.fmake file found, can't determine output file")
+            exit()
+        for line in f:
+            temp.append(line)
+        f.close()
+        
+        while i < len(temp):
+            
+            if len(temp[i].split()) == 0:
+                pass 
+            elif temp[i].split()[0] == "target":
+                if temp[i].split()[1] != "$":
+                    os.remove(temp[i].split()[2])
+                else:
+                    os.remove("main")
+            else:
+                pass
+            i += 1
+
+    elif ar[0] == "example":
+        if os.path.exists("make.fmake"):
+            print("Woah, you already have a make.fmake file, I can't make an")
+            print("example file with a pre-existing make.fmake file...")
+        else:
+            f = open("make.fmake","w")
+            f.write("# Example fmake file\n\n")
+            
+            f.write("cc = gcc\n")
+            f.write("src = main.c\n\n")
+
+            f.write("# A $ means it's using the default option\n\n")
+            
+            f.write("target $\n")
+            f.write("msg = true\n")
+
+            f.close()
+    elif ar[0] == "--help":
+        print("Usage: fmake [option]\n")
+        
+        print("Options:")
+        print("clean: Removes a specified output file")
+        print("example: Creates an example make.fmake file")
+        print("--help: Shows this help message")

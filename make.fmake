@@ -1,0 +1,9 @@
+# Example fmake file
+
+cc = gcc
+src = main.c
+
+# A $ means it's using the default option
+
+target $
+msg = true
