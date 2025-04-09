@@ -1,5 +1,5 @@
 # fmake
-A custom build utility, written in python
+A custom build utility, written in Python
 
 # Setup
 
