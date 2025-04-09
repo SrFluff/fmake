@@ -29,4 +29,15 @@ Here are the available variables
 | msg | true | true / false | Whether or not the "Done!" message is displayed after compilation |
 | target | main | Any filename | The name of the executable file the compiler will produce |
 
+# Making a project
+
+If you want to set up a new C project you can run `fmake project` which creates an `src/` and a `build/` directory, alongside a preconfigured `make.fmake` file. The sourcetree should look something like this:
+
+```
+src/
+src/main.c
+build/
+make.fmake
+```
+
 For more info run `fmake --help`
