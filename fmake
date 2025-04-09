@@ -136,6 +136,37 @@ else:
             f.write("msg = true\n")
 
             f.close()
+    elif ar[0] == "project":
+        if os.path.exists("src") or os.path.exists("main.c") or os.path.exists("make.fmake"):
+            print("Woah pal, looks like you've already got a project going on here")
+            print("don't do this okay?")
+        else:
+            os.system("mkdir src")
+            os.system("mkdir build")
+            
+            f = open("make.fmake", "w")
+            
+            f.write("cc $\n")
+            f.write("src = src/main.c\n")
+            f.write("target = build/main\n")
+            f.write("msg = false\n");
+            
+            f.close()
+            
+            f = open("src/main.c","w")
+            
+            f.write("#include <stdio.h>\n")
+            f.write("#include <string.h>\n")
+            f.write("#include <stdlib.h>\n\n")
+
+            f.write("int main(void) {\n\n")
+
+            f.write("  return 0;\n\n")
+
+            f.write("}\n")
+            
+            f.close()
+    
     elif ar[0] == "--help":
         print("Usage: fmake [option]\n")
         
