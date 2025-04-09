@@ -173,4 +173,5 @@ else:
         print("Options:")
         print("clean: Removes a specified output file")
         print("example: Creates an example make.fmake file")
+        print("project: Creates a new project with a src/ and build/ directory") 
         print("--help: Shows this help message")
