@@ -19,7 +19,7 @@ If you want to generate a new example config run `fmake example`.\
 If you want to make a config file from scratch here's how to do that:\
 \
 `variable =/$ value(if applicable)`\
-To set a variable to it's default write `variable $`.\
+To set a variable to it's default value, write `variable $`.\
 \
 Here are the available variables
 | Variable | Default | Possible values | about |
