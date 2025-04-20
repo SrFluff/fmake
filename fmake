@@ -94,7 +94,9 @@ if len(ar) == 0:
         exit()
 
 else:
-    
+
+    # Removes your target
+
     if ar[0] == "clean":
         
         if os.path.exists("make.fmake"):
@@ -119,6 +121,8 @@ else:
                 pass
             i += 1
 
+    # Creates an example config
+
     elif ar[0] == "example":
         if os.path.exists("make.fmake"):
             print("Woah, you already have a make.fmake file, I can't make an")
@@ -136,6 +140,9 @@ else:
             f.write("msg = true\n")
 
             f.close()
+
+    # Creates src/ and build/
+
     elif ar[0] == "project":
         if os.path.exists("src") or os.path.exists("main.c") or os.path.exists("make.fmake"):
             print("Woah pal, looks like you've already got a project going on here")
@@ -167,7 +174,9 @@ else:
             
             f.close()
     
-    elif ar[0] == "--help":
+    # Help msg
+
+    elif ar[0] == "--help" or ar[0] == "-h" or ar[0] == "-?":
         print("Usage: fmake [option]\n")
         
         print("Options:")
