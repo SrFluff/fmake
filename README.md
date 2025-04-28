@@ -43,7 +43,8 @@ make.fmake
 
 # Debugging
 
-If you want to make sure all the variables in `make.fmake` are correctly declared you can run `fmake debug`. This should return something like this:\
+If you want to make sure all the variables in `make.fmake` are correctly declared you can run `fmake debug`. This should return something like this:
+
 ```
 CC:gcc
 SRC:main.c
