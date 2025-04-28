@@ -1,186 +1,115 @@
 #!/bin/python3
 
-# Imports
+ver = "1.1.0"
 
+from sys import argv
 import os
-from sys import argv as ar
 
-# Variables
-
-compiler = 'gcc'
-source = 'main.c'
-output = 'main'
-
-temp = []
-
+cc = "gcc"
+out = "main"
+src = "main.c"
 msg = True
+say = "Compiling done!"
 
-i = 0
-
-# Program code
-
-ar.pop(0)
-
-if len(ar) == 0:
-
-    if not os.path.exists("make.fmake"):
- 
-        print("No make.fmake file found, quit it.")
-        exit()
-
-if len(ar) == 0:
-    
-        # Proceed with making
-        
-        f = open("make.fmake", "r")
-        
-        for line in f:
-            temp.append(line)
-        
-        f.close()
-
-        while i < len(temp):
-            
-            # It saves so much time
-
-            doc = temp[i].split()
-
-            if temp[i].split() == []:
-                pass
-
-            # I'm more of a gcc guy, rather than clang, that's why it's the default
-            
-            elif doc[0] == 'cc':
-                if doc[1] == '=':
-                    compiler = doc[2]
-                elif doc[1] == '$':
-                    compiler = 'gcc'
-            
-            # I can't just assume you're gonna name the file main.c
-
-            elif doc[0] == 'src':
-                if doc[1] == '=':
-                    source = doc[2]
-                elif doc[1] == '$':
-                    source = 'main.c'
-            
-            # In case you want to rename the output file
-
-            elif doc[0] == 'target':
-                if doc[1] == '=':
-                    output = doc[2]
-                elif doc[1] == '$':
-                    output = 'main'
-
-            # It's that "Done!" message it displays
-
-            elif doc[0] == 'msg':
-                if doc[1] == '=':
-                    if doc[2].lower() == "true":
-                        msg = True
-                    elif doc[2].lower() == "false":
-                        msg = False
-                elif doc[1] == '$':
+if os.path.exists("make.fmake"):
+    f = open("make.fmake", "r")
+    doc = []
+    for line in f:
+        doc.append(line[0:len(line)-1])
+    i = 0
+    while i < len(doc):
+        if len(doc[i].split()) != 0:
+            if doc[i].split()[0] == "cc":
+                if doc[i].split()[1] == "$":
+                    cc = "gcc"
+                elif doc[i].split()[1] == "=":
+                    cc = doc[i].split()[2]
+            elif doc[i].split()[0] == "out":
+                if doc[i].split()[1] == "$":
+                    out = "main"
+                elif doc[i].split()[1] == "=":
+                    out = doc[i].split()[2]
+            elif doc[i].split()[0] == "src":
+                if doc[i].split()[1] == "$":
+                    src = "main.c"
+                elif doc[i].split()[1] == "=":
+                    src = doc[i].split()[2]
+            elif doc[i].split()[0] == "msg":
+                if doc[i].split()[1] == "$":
                     msg = True
-
-            i += 1
-
-        # The actual compiling
-
-        os.system(f"{compiler} {source} -o {output}")
-        
-        if msg:
-            print("Done!")
-        exit()
-
-else:
-
-    # Removes your target
-
-    if ar[0] == "clean":
-        
-        if os.path.exists("make.fmake"):
-            f = open("make.fmake","r")
-        else:
-            print("No make.fmake file found, can't determine output file")
-            exit()
-        for line in f:
-            temp.append(line)
-        f.close()
-        
-        while i < len(temp):
-            
-            if len(temp[i].split()) == 0:
-                pass 
-            elif temp[i].split()[0] == "target":
-                if temp[i].split()[1] != "$":
-                    os.remove(temp[i].split()[2])
-                else:
-                    os.remove("main")
+                elif doc[i].split()[1] == "=":
+                    if doc[i].split()[2] == "true":
+                        msg = True
+                    elif doc[i].split()[2] == "false":
+                        msg = False
+            elif doc[i].split()[0] == "say":
+                if doc[i].split()[1] == "$":
+                    say = "Compiling done!"
+                elif doc[i].split()[1] == "=":
+                    say = doc[i][6:len(doc[i])]
             else:
                 pass
-            i += 1
+        i += 1
+argv.pop(0)
 
-    # Creates an example config
-
-    elif ar[0] == "example":
-        if os.path.exists("make.fmake"):
-            print("Woah, you already have a make.fmake file, I can't make an")
-            print("example file with a pre-existing make.fmake file...")
-        else:
-            f = open("make.fmake","w")
-            f.write("# Example fmake file\n\n")
+if len(argv) == 0:
+    if not os.path.exists("make.fmake"):
+        print("[ERROR]: No make.fmake file found.")
+    else:
+        os.system(f"{cc} {src} -o {out}")
+        if msg:
+            print(say)
+else:
+    if len(argv) == 1:
+        if argv[0] == "--help" or argv[0] == "-h" or argv[0] == "-?":
+            print("Usage: fmake [option]\n")
             
-            f.write("cc = gcc\n")
-            f.write("src = main.c\n\n")
-
-            f.write("# A $ means it's using the default option\n\n")
-            
-            f.write("target $\n")
-            f.write("msg = true\n")
-
-            f.close()
-
-    # Creates src/ and build/
-
-    elif ar[0] == "project":
-        if os.path.exists("src") or os.path.exists("main.c") or os.path.exists("make.fmake"):
-            print("Woah pal, looks like you've already got a project going on here")
-            print("don't do this okay?")
-        else:
-            os.system("mkdir src")
-            os.system("mkdir build")
-            
-            f = open("make.fmake", "w")
-            
-            f.write("cc $\n")
-            f.write("src = src/main.c\n")
-            f.write("target = build/main\n")
-            f.write("msg = false\n");
-            
-            f.close()
-            
-            f = open("src/main.c","w")
-            
+            print("Options:")
+            print("example - Generates an example make.fmake file")
+            print("project - Creates a src/ and build/ directory, along with a make.fmake file")
+            print("debug   - Shows all variables (CC,SRC,OUT,MSG,SAY)")
+            print("clean   - Removes any executable files declared in make.fmake")
+            print("version - Return the current fmake version")
+        elif argv[0] == "version" or argv[0] == "-version" or argv[0] == "-v":
+            print(ver)
+        elif argv[0] == "debug":
+            print(f"CC: {cc}\nSRC:{src}\nOUT:{out}\nMSG:{msg}\nSAY:{say}")
+        elif argv[0] == "clean":
+            if os.path.exists("make.fmake"):
+                os.remove(out)
+            else:
+                print("[ERROR]: No make.fmake file, cannot determine executable")
+        elif argv[0] == "example":
+            if os.path.exists("make.fmake"):
+                a = input("Override current make.fmake?[Y/N] ")
+                if a.lower() == "y":
+                    os.remove("make.fmake")
+                    f = open("make.fmake","a")
+                    f.write("# Example fmake file\n")
+                    f.write("\n")
+                    f.write("cc = gcc\n")
+                    f.write("\n")
+                    f.write("# A $ means it's using the default value\n")
+                    f.write("src $\n")
+                    f.write("out = main\n")
+                    f.write("msg = true\n")
+                    f.write("say $\n")
+                    f.close()
+                    print("Done!")
+        elif argv[0] == "project":
+            os.system("mkdir src/;mkdir build/;touch src/main.c")
+            f = open("src/main.c","a")
             f.write("#include <stdio.h>\n")
-            f.write("#include <string.h>\n")
-            f.write("#include <stdlib.h>\n\n")
-
-            f.write("int main(void) {\n\n")
-
-            f.write("  return 0;\n\n")
-
+            f.write("\n")
+            f.write("int main(void) {")
+            f.write("\n")
+            f.write("    return 0;\n")
             f.write("}\n")
-            
-            f.close()
-    
-    # Help msg
-
-    elif ar[0] == "--help" or ar[0] == "-h" or ar[0] == "-?":
-        print("Usage: fmake [option]\n")
-        
-        print("Options:")
-        print("clean: Removes a specified output file")
-        print("example: Creates an example make.fmake file")
-        print("project: Creates a new project with a src/ and build/ directory") 
-        print("--help: Shows this help message")
+            if not os.path.exists("make.fmake"):
+                f = open("make.fmake","a")
+                f.write("cc $\n")
+                f.write("src src/main.c\n")
+                f.write("out = build/main\n")
+                f.write("msg $\n")
+                f.write("say $\n")
+                f.close()

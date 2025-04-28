@@ -27,7 +27,8 @@ Here are the available variables
 | cc | gcc | Any compiler | The compiler you want to use |
 | src | main.c | Any .c file | The source C file |
 | msg | true | true / false | Whether or not the "Done!" message is displayed after compilation |
-| target | main | Any filename | The name of the executable file the compiler will produce |
+| out | main | Any filename | The name of the executable file the compiler will produce |
+| say | "Compiling done!" | Any string | The message that's printed after compilation |
 
 # Making a project
 
@@ -40,4 +41,21 @@ build/
 make.fmake
 ```
 
-For more info run `fmake --help`
+# Debugging
+
+If you want to make sure all the variables in `make.fmake` are correctly declared you can run `fmake debug`. This should return something like this:\
+```
+CC:gcc
+SRC:main.c
+OUT:main
+MSG:True
+SAY:Compiling done!
+```
+
+# Version
+
+Run `fmake --version`,`fmake -v`, or `fmake version` for the current version.
+
+# Help
+
+For more info run `fmake --help`, `fmake -?`, or `fmake -h`.
