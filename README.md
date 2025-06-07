@@ -29,6 +29,7 @@ Here are the available variables
 | msg | true | true / false | Whether or not the "Done!" message is displayed after compilation |
 | out | main | Any filename | The name of the executable file the compiler will produce |
 | say | "Compiling done!" | Any string | The message that's printed after compilation |
+| run | false | true/false | Whether or not the executable is run once compiling is done |
 
 # Making a project
 
@@ -51,6 +52,7 @@ SRC:main.c
 OUT:main
 MSG:True
 SAY:Compiling done!
+RUN:false
 ```
 
 # Version

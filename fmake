@@ -1,6 +1,6 @@
 #!/bin/python3
 
-ver = "1.1.0"
+ver = "1.2.0"
 
 from sys import argv
 import os
@@ -10,6 +10,7 @@ out = "main"
 src = "main.c"
 msg = True
 say = "Compiling done!"
+run = False
 
 if os.path.exists("make.fmake"):
     f = open("make.fmake", "r")
@@ -42,6 +43,15 @@ if os.path.exists("make.fmake"):
                         msg = True
                     elif doc[i].split()[2] == "false":
                         msg = False
+            elif doc[i].split()[0] == "run":
+                if doc[i].split()[1] == "$":
+                    run = False
+                elif doc[i].split()[1] == "=":
+                    if doc[i].split()[2] == "false":
+                        run = False
+                    elif doc[i].split()[2] == "true":
+                        run = True
+
             elif doc[i].split()[0] == "say":
                 if doc[i].split()[1] == "$":
                     say = "Compiling done!"
@@ -59,6 +69,8 @@ if len(argv) == 0:
         os.system(f"{cc} {src} -o {out}")
         if msg:
             print(say)
+        if run:
+            os.system(f"./{out}")
 else:
     if len(argv) == 1:
         if argv[0] == "--help" or argv[0] == "-h" or argv[0] == "-?":
@@ -73,7 +85,7 @@ else:
         elif argv[0] == "version" or argv[0] == "-version" or argv[0] == "-v":
             print(ver)
         elif argv[0] == "debug":
-            print(f"CC: {cc}\nSRC:{src}\nOUT:{out}\nMSG:{msg}\nSAY:{say}")
+            print(f"CC: {cc}\nSRC:{src}\nOUT:{out}\nMSG:{msg}\nSAY:{say}\nRUN:{run}")
         elif argv[0] == "clean":
             if os.path.exists("make.fmake"):
                 os.remove(out)
@@ -82,20 +94,22 @@ else:
         elif argv[0] == "example":
             if os.path.exists("make.fmake"):
                 a = input("Override current make.fmake?[Y/N] ")
-                if a.lower() == "y":
-                    os.remove("make.fmake")
-                    f = open("make.fmake","a")
-                    f.write("# Example fmake file\n")
-                    f.write("\n")
-                    f.write("cc = gcc\n")
-                    f.write("\n")
-                    f.write("# A $ means it's using the default value\n")
-                    f.write("src $\n")
-                    f.write("out = main\n")
-                    f.write("msg = true\n")
-                    f.write("say $\n")
-                    f.close()
-                    print("Done!")
+                if a.lower() == "n":
+                    exit()
+                os.remove("make.fmake")
+                f = open("make.fmake","a")
+                f.write("# Example fmake file\n")
+                f.write("\n")
+                f.write("cc = gcc\n")
+                f.write("\n")
+                f.write("# A $ means it's using the default value\n")
+                f.write("src $\n")
+                f.write("out = main\n")
+                f.write("msg = true\n")
+                f.write("say $\n")
+                f.write("run = false\n")
+                f.close()
+                print("Done!")
         elif argv[0] == "project":
             os.system("mkdir src/;mkdir build/;touch src/main.c")
             f = open("src/main.c","a")
@@ -108,8 +122,9 @@ else:
             if not os.path.exists("make.fmake"):
                 f = open("make.fmake","a")
                 f.write("cc $\n")
-                f.write("src src/main.c\n")
+                f.write("src = src/main.c\n")
                 f.write("out = build/main\n")
                 f.write("msg $\n")
                 f.write("say $\n")
+                f.write("run = false\n")
                 f.close()

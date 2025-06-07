@@ -7,3 +7,4 @@ src $
 out = main
 msg = true
 say $
+run = false
