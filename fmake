@@ -1,6 +1,6 @@
 #!/bin/python3
 
-ver = "1.2.0"
+ver = "1.2.1"
 
 from sys import argv
 import os
