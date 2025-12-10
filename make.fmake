@@ -1,10 +1,7 @@
-# Example fmake file
-
+# Auto generated config
 cc = gcc
-
-# A $ means it's using the default value
-src $
+src = main.c
 out = main
 msg = true
 say $
-run = false
+run false

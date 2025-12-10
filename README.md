@@ -10,6 +10,16 @@ To make `fmake` executable, run\
 If that doesn't work, uh...**sudo it**\
 Then, to be able to run it, move it into your `/usr/local/bin` directory
 
+# Compiling
+
+Compiling with fmake goes as follows:\
+`fmake rule <rule>` for compiling a specific rule
+`fmake` for compiling with the default `make.fmake` rule
+
+# Rules
+
+To make a rule, just make a .fmake file with the rule name. (Ex. if you want a rule named "test", make a `test.fmake` file)
+
 # Config file
 
 This repo comes with an example `make.fmake` file\
@@ -44,15 +54,15 @@ make.fmake
 
 # Debugging
 
-If you want to make sure all the variables in `make.fmake` are correctly declared you can run `fmake debug`. This should return something like this:
+If you want to make sure all the variables in a rule are correctly declared you can run `fmake debug <rule>`(or `fmake debug' for make.fmake). This should return something like this:
 
 ```
-CC:gcc
-SRC:main.c
-OUT:main
-MSG:True
-SAY:Compiling done!
-RUN:false
+CC:     gcc
+SRC:    main.c
+OUT:    main
+MSG:    True
+SAY:    Compiling done!
+RUN:    False
 ```
 
 # Version
