@@ -1,6 +1,6 @@
 #!/bin/python3
 
-version = "1.3.0"
+version = "1.4.0"
 
 import sys
 import os
@@ -16,6 +16,8 @@ out = "main"
 msg = True
 say = "Compilation done!"
 run = False
+mke = False
+mkf = "-j$(nproc)"
 
 def getVer():
     print(version)
@@ -44,6 +46,8 @@ def debug():
     print(f"MSG\t{msg}")
     print(f"SAY\t{say}")
     print(f"RUN\t{run}")
+    print(f"MKE\t{mke}")
+    print(f"MKF\t{mkf}")
     exit()
 
 def readConfig(configName):
@@ -53,6 +57,9 @@ def readConfig(configName):
     global msg
     global say
     global run
+    global mke
+    global mkf
+
     if not os.path.exists(configName + ".fmake"):
         print("[ERROR] Rule has no fmake file")
         exit()
@@ -80,11 +87,29 @@ def readConfig(configName):
                             run = True
                         if i.split()[2] == "false":
                             run = False
+                    if i.split()[0] == "mke":
+                        if i.split()[2] == "true":
+                            mke = True
+                        if i.split()[2] == "false":
+                            mke = False
+                    if i.split()[0] == "mkf":
+                        while i[0] != "=":
+                            i = i[1:]
+                        i = i[1:]
+                        while i[0] == " ":
+                            i = i[1:]
+                        mkf = i
 
 def comp():
-    os.system(f"{cc} {src} -o {out}")
+
+    if not mke:
+        os.system(f"{cc} {src} -o {out}")
+    if mke:
+        os.system(f"make {mkf}")
     if msg:
         print(say)
+    if run and not mke:
+        os.system(f"./{out}")
     exit()
 
 def clean():
@@ -97,7 +122,7 @@ def genConfig():
     if os.path.exists("make.fmake"):
         os.remove("make.fmake")
     f = open("make.fmake","w")
-    f.write("# Auto generated config\ncc = gcc\nsrc = main.c\nout = main\nmsg = true\nsay $\nrun false\n")
+    f.write("# Auto generated config\ncc = gcc\nsrc = main.c\nout = main\nmsg = true\nsay $\nrun false\nmke = false\nmkf $\n")
     f.close()
     exit()
 
@@ -110,6 +135,13 @@ def example():
             exit()
     else:
         genConfig()
+
+def project():
+    os.mkdir("build")
+    os.mkdir("src")
+    f = open("make.fmake","w")
+    f.write("src = src/main.c\nout = build/main\n")
+    f.close()
 
 if len(sys.argv) == 1 and sys.argv[0] in helps:
     getHelp()
@@ -124,6 +156,8 @@ elif len(sys.argv) == 1:
         clean()
     elif sys.argv[0] == "example":
         example()
+    elif sys.argv[0] == "project":
+        project()
 elif len(sys.argv) == 2:
     if sys.argv[0] == "debug":
         readConfig(sys.argv[1])

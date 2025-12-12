@@ -32,14 +32,16 @@ If you want to make a config file from scratch here's how to do that:\
 To set a variable to it's default value, write `variable $`.\
 \
 Here are the available variables
-| Variable | Default | Possible values | about |
-|----------|---------|-----------------|-------|
-| cc | gcc | Any compiler | The compiler you want to use |
-| src | main.c | Any .c file | The source C file |
-| msg | true | true / false | Whether or not the "Done!" message is displayed after compilation |
-| out | main | Any filename | The name of the executable file the compiler will produce |
-| say | "Compiling done!" | Any string | The message that's printed after compilation |
-| run | false | true/false | Whether or not the executable is run once compiling is done |
+| Variable | Default             | Possible values | about                                                             |
+|----------|---------------------|-----------------|-------------------------------------------------------------------|
+| cc       | gcc                 | Any compiler    | The compiler you want to use                                      |
+| src      | main.c              | Any .c file     | The source C file                                                 |
+| msg      | true                | true/false      | Whether or not the "Done!" message is displayed after compilation |
+| out      | main                | Any filename    | The name of the executable file the compiler will produce         |
+| say      | "Compiling done!"   | Any string      | The message that's printed after compilation                      |
+| run      | false               | true/false      | Whether or not the executable is run once compiling is done       |
+| mke      | false               | true/false      | Whether or not to run `make` instead of a compiler                |
+| mkf      | -j$(nproc)          | any flags       | The flags and arguments that get passed to `make`                 |
 
 # Making a project
 
@@ -63,6 +65,8 @@ OUT:    main
 MSG:    True
 SAY:    Compiling done!
 RUN:    False
+MKE:    False
+MKF:    -j$(nproc)
 ```
 
 # Version
