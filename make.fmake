@@ -5,5 +5,5 @@ out = main
 msg = true
 say $
 run false
-mke = true
-mkr = -j8
+mke = false
+mkf $
