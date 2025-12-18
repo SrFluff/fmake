@@ -12,16 +12,12 @@ sys.argv.pop(0)
 helps = ["help","--help","-?","-h"]
 versions = ["-v","--version","version"]
 
-cc = "gcc"
-src = "main.c"
-out = "main"
-msg = True
-say = "Compilation done!"
-run = False
-mke = False
-mkf = "-j$(nproc)"
+def setVar(vals=("gcc","main.c","main",True,"Compiling done!",False,False,"-j$(nproc)")):
+    global var
+    var = vals
+ 
+setVar()
 
-var = (cc,src,out,msg,say,run,mke,mkf)
 
 def getVer():
     print(version)
@@ -56,7 +52,7 @@ def debug():
 
 def comp():
 
-    if not var[7]:
+    if not var[6]:
         os.system(f"{var[0]} {var[1]} -o {var[2]}")
     if var[6]:
         os.system(f"make {var[7]}")
@@ -92,31 +88,31 @@ if len(sys.argv) == 1 and sys.argv[0] in helps:
     getHelp()
 elif len(sys.argv) == 1:
     if sys.argv[0] == "debug":
-        var = libfmake.readConfig("make.fmake")
+        setVar(libfmake.readConfig("make.fmake"))
         debug()
     elif sys.argv[0] in versions:
         getVer()
     elif sys.argv[0] == "clean":
-        var = libfmake.readConfig("make.fmake")
+        setVar(libfmake.readConfig("make.fmake"))
         clean()
     elif sys.argv[0] == "example":
         example()
     elif sys.argv[0] == "project":
         project()
     elif sys.argv[0] == "make-lib":
-        var = libfmake.readConfig("make.fmake")
+        setVar(libfmake.readConfig("make.fmake"))
         comp()
 
 elif len(sys.argv) == 2:
     if sys.argv[0] == "debug":
-        var = libfmake.readConfig(sys.argv[1])
+        setVar(libfmake.readConfig(sys.argv[1]))
         debug()
     elif sys.argv[0] == "clean":
-        readConfig(sys.argv[1])
+        setVar(libfmake.readConfig(sys.argv[1]))
         clean()
     elif sys.argv[0] == "rule":
-        var = libfmake.readConfig(sys.argv[1])
+        setVar(libfmake.readConfig(sys.argv[1]))
         comp()
 elif len(sys.argv) == 0:
-    var = libfmake.readConfig("make.fmake")
+    setVar(libfmake.readConfig("make.fmake"))
     comp()
