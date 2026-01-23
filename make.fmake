@@ -1,9 +1,8 @@
-# Auto generated config
 cc = gcc
 src = main.c
 out = main
 msg = true
-say $
-run false
+say = Compiling done!
+run = false
 mke = false
-mkf $
+mkf = -j$(nproc)

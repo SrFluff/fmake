@@ -1,8 +1,12 @@
 #!/bin/python3
 
-import libfmake
+try:
+    import libfmake
+except ModuleNotFoundError:
+    print("[ERROR] You need to install libfmake, or add libfmake to your PYTHONPATH")
+    exit()
 
-version = "1.4.1"
+version = "1.4.2"
 
 import sys
 import os
