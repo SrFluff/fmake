@@ -1,6 +1,12 @@
 #!/bin/python3
 
-version = "1.4.0"
+try:
+    import libfmake
+except ModuleNotFoundError:
+    print("[ERROR] You need to install libfmake, or add libfmake to your PYTHONPATH")
+    exit()
+
+version = "1.4.2"
 
 import sys
 import os
@@ -10,14 +16,12 @@ sys.argv.pop(0)
 helps = ["help","--help","-?","-h"]
 versions = ["-v","--version","version"]
 
-cc = "gcc"
-src = "main.c"
-out = "main"
-msg = True
-say = "Compilation done!"
-run = False
-mke = False
-mkf = "-j$(nproc)"
+def setVar(vals=("gcc","main.c","main",True,"Compiling done!",False,False,"-j$(nproc)")):
+    global var
+    var = vals
+ 
+setVar()
+
 
 def getVer():
     print(version)
@@ -40,134 +44,79 @@ def getHelp():
     print("If you just want to compile the default make.fmake, just run fmake")
 
 def debug():
-    print(f"CC:\t{cc}")
-    print(f"SRC\t{src}")
-    print(f"OUT\t{out}")
-    print(f"MSG\t{msg}")
-    print(f"SAY\t{say}")
-    print(f"RUN\t{run}")
-    print(f"MKE\t{mke}")
-    print(f"MKF\t{mkf}")
+    print(f"CC:\t{var[0]}")
+    print(f"SRC\t{var[1]}")
+    print(f"OUT\t{var[2]}")
+    print(f"MSG\t{var[3]}")
+    print(f"SAY\t{var[4]}")
+    print(f"RUN\t{var[5]}")
+    print(f"MKE\t{var[6]}")
+    print(f"MKF\t{var[7]}")
     exit()
-
-def readConfig(configName):
-    global cc
-    global src
-    global out
-    global msg
-    global say
-    global run
-    global mke
-    global mkf
-
-    if not os.path.exists(configName + ".fmake"):
-        print("[ERROR] Rule has no fmake file")
-        exit()
-    f = open(configName + ".fmake","r")
-    temp = []
-    for i in f:
-        if not len(i.split()) == 0:
-            if not i.split()[0][0] == "#":
-                if len(i.split()) >= 3:
-                    if i.split()[0] == "cc":
-                        cc = i.split()[2]
-                    if i.split()[0] == "src":
-                        src = i.split()[2]
-                    if i.split()[0] == "out":
-                        out = i.split()[2]
-                    if i.split()[0] == "msg":
-                        if i.split()[2] == "true":
-                            msg = True
-                        if i.split()[2] == "false":
-                            msg = False
-                    if i.split()[0] == "say":
-                        say = " ".join(i.split()[2:])
-                    if i.split()[0] == "run":
-                        if i.split()[2] == "true":
-                            run = True
-                        if i.split()[2] == "false":
-                            run = False
-                    if i.split()[0] == "mke":
-                        if i.split()[2] == "true":
-                            mke = True
-                        if i.split()[2] == "false":
-                            mke = False
-                    if i.split()[0] == "mkf":
-                        while i[0] != "=":
-                            i = i[1:]
-                        i = i[1:]
-                        while i[0] == " ":
-                            i = i[1:]
-                        mkf = i
 
 def comp():
 
-    if not mke:
-        os.system(f"{cc} {src} -o {out}")
-    if mke:
-        os.system(f"make {mkf}")
-    if msg:
-        print(say)
-    if run and not mke:
-        os.system(f"./{out}")
+    if not var[6]:
+        os.system(f"{var[0]} {var[1]} -o {var[2]}")
+    if var[6]:
+        os.system(f"make {var[7]}")
+    if var[3]:
+        print(var[4])
+    if var[5] and not var[7]:
+        os.system(f"./{var[2]}")
     exit()
 
 def clean():
-    if os.path.exists(out):
-        print(f"CLEAN\t{out}")
-        os.remove(out)
+    if os.path.exists(var[2]):
+        print(f"CLEAN\t{var[2]}")
+        os.remove(var[2])
     exit()
 
-def genConfig():
-    if os.path.exists("make.fmake"):
-        os.remove("make.fmake")
-    f = open("make.fmake","w")
-    f.write("# Auto generated config\ncc = gcc\nsrc = main.c\nout = main\nmsg = true\nsay $\nrun false\nmke = false\nmkf $\n")
-    f.close()
-    exit()
 
 def example():
     if os.path.exists("make.fmake"):
         a = input("Overwrite existing make.fmake file? (y/N) ")
         if a.lower() == "y":
-            genConfig()
+            libfmake.genConfig("make.fmake",True)
         else:
             exit()
     else:
-        genConfig()
+        libfmake.genConfig("make.fmake",True)
 
 def project():
     os.mkdir("build")
     os.mkdir("src")
-    f = open("make.fmake","w")
-    f.write("src = src/main.c\nout = build/main\n")
-    f.close()
+    libfmake.genConfig("make.fmake",True,"gcc","src/main.c","build/main")
 
 if len(sys.argv) == 1 and sys.argv[0] in helps:
     getHelp()
 elif len(sys.argv) == 1:
     if sys.argv[0] == "debug":
-        readConfig("make")
+        setVar(libfmake.readConfig("make.fmake"))
         debug()
     elif sys.argv[0] in versions:
         getVer()
     elif sys.argv[0] == "clean":
-        readConfig("make")
+        setVar(libfmake.readConfig("make.fmake"))
         clean()
     elif sys.argv[0] == "example":
         example()
     elif sys.argv[0] == "project":
         project()
+    elif sys.argv[0] == "make-lib":
+        setVar(libfmake.readConfig("make.fmake"))
+        comp()
+
 elif len(sys.argv) == 2:
     if sys.argv[0] == "debug":
-        readConfig(sys.argv[1])
+        setVar(libfmake.readConfig(sys.argv[1]))
         debug()
     elif sys.argv[0] == "clean":
-        readConfig(sys.argv[1])
+        setVar(libfmake.readConfig(sys.argv[1]))
         clean()
     elif sys.argv[0] == "rule":
-        readConfig(sys.argv[1])
+        setVar(libfmake.readConfig(sys.argv[1]))
         comp()
 elif len(sys.argv) == 0:
-    readConfig("make")
+    setVar(libfmake.readConfig("make.fmake"))
     comp()
