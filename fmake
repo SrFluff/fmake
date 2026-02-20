@@ -1,122 +1,134 @@
 #!/bin/python3
-
-try:
-    import libfmake
-except ModuleNotFoundError:
-    print("[ERROR] You need to install libfmake, or add libfmake to your PYTHONPATH")
-    exit()
-
-version = "1.4.2"
-
-import sys
+version = "1.5.2"
 import os
-
+import libfmake
+import sys
 sys.argv.pop(0)
 
-helps = ["help","--help","-?","-h"]
-versions = ["-v","--version","version"]
+vals = ("gcc","main.c","main",True,"Compiling done!",False,False,"-j$(nproc)")
 
-def setVar(vals=("gcc","main.c","main",True,"Compiling done!",False,False,"-j$(nproc)")):
-    global var
-    var = vals
- 
-setVar()
-
-
-def getVer():
-    print(version)
-    exit()
-
-def getHelp():
-    print("Usage: fmake [OPTION...] [RULE...]")
-    print()
-    print("Options:")
-    print("rule\tcompiles a specific rule")
-    print("example\tgenerates an example make.fmake config")
-    print("debug\tprints the value of all possible variables")
-    print("project\tmakes a build/ & src/ directory along with a custom make.fmake files")
-    print("clean\tremoves any detected compiled executables")
-    print("version\tprints fmake version")
-    print()
-    print("Rules:")
-    print("To compile a specific rule a <rule>.fmake file must be present")
-    print("along with that, you can compile the rule by running fmake rule <rule>")
-    print("If you just want to compile the default make.fmake, just run fmake")
-
-def debug():
-    print(f"CC:\t{var[0]}")
-    print(f"SRC\t{var[1]}")
-    print(f"OUT\t{var[2]}")
-    print(f"MSG\t{var[3]}")
-    print(f"SAY\t{var[4]}")
-    print(f"RUN\t{var[5]}")
-    print(f"MKE\t{var[6]}")
-    print(f"MKF\t{var[7]}")
-    exit()
+cc = vals[0]
+src = vals[1]
+out = vals[2]
+msg = vals[3]
+say = vals[4]
+run = vals[5]
+mke = vals[6]
+mkf = vals[7]
 
 def comp():
+    
+    cc = vals[0]
+    src = vals[1]
+    out = vals[2]
+    msg = vals[3]
+    say = vals[4]
+    run = vals[5]
+    mke = vals[6]
+    mkf = vals[7]
 
-    if not var[6]:
-        os.system(f"{var[0]} {var[1]} -o {var[2]}")
-    if var[6]:
-        os.system(f"make {var[7]}")
-    if var[3]:
-        print(var[4])
-    if var[5] and not var[7]:
-        os.system(f"./{var[2]}")
-    exit()
+    if not mke:
+        os.system(f"{cc} -o {out} {src}")
+    else:
+        os.system(f"make {mkf}")
+    if msg:
+        print(say)
+
+def debug():
+    cc = vals[0]
+    src = vals[1]
+    out = vals[2]
+    msg = vals[3]
+    say = vals[4]
+    run = vals[5]
+    mke = vals[6]
+    mkf = vals[7]
+
+    print(f"CC:\t{cc}")
+    print(f"SRC:\t{src}")
+    print(f"OUT:\t{out}")
+    print(f"MSG:\t{msg}")
+    print(f"SAY:\t{say}")
+    print(f"RUN:\t{run}")
+    print(f"MKE:\t{mke}")
+    print(f"MKF:\t{mkf}")
 
 def clean():
-    if os.path.exists(var[2]):
-        print(f"CLEAN\t{var[2]}")
-        os.remove(var[2])
-    exit()
+    cc = vals[0]
+    src = vals[1]
+    out = vals[2]
+    msg = vals[3]
+    say = vals[4]
+    run = vals[5]
+    mke = vals[6]
+    mkf = vals[7]
 
+    if os.path.exists(out):
+        os.remove(out)
 
-def example():
-    if os.path.exists("make.fmake"):
-        a = input("Overwrite existing make.fmake file? (y/N) ")
-        if a.lower() == "y":
-            libfmake.genConfig("make.fmake",True)
-        else:
-            exit()
-    else:
-        libfmake.genConfig("make.fmake",True)
-
-def project():
-    os.mkdir("build")
-    os.mkdir("src")
-    libfmake.genConfig("make.fmake",True,"gcc","src/main.c","build/main")
-
-if len(sys.argv) == 1 and sys.argv[0] in helps:
-    getHelp()
+if len(sys.argv) == 0:
+    vals = libfmake.readConfig("make.fmake")
 elif len(sys.argv) == 1:
-    if sys.argv[0] == "debug":
-        setVar(libfmake.readConfig("make.fmake"))
-        debug()
-    elif sys.argv[0] in versions:
-        getVer()
-    elif sys.argv[0] == "clean":
-        setVar(libfmake.readConfig("make.fmake"))
-        clean()
-    elif sys.argv[0] == "example":
-        example()
-    elif sys.argv[0] == "project":
-        project()
-    elif sys.argv[0] == "make-lib":
-        setVar(libfmake.readConfig("make.fmake"))
-        comp()
+    if os.path.exists("make.fmake"):
+        libfmake.readConfig("make.fmake")
+    else:
+        print("[ERROR] No 'make.fmake' file.")
+        sys.exit()
+    match sys.argv[0]:
+        case "debug":
+            debug()
+        case "clean":
+            clean()
+        case "version":
+            print(version)
+        case "project":
+            if not os.path.exists("src/"):
+                os.mkdir("src")
+            if not os.path.exists("build/"):
+                os.mkdir("build")
+            if not os.path.exists("src/main.c"):
+                f = open("src/main.c","w")
+                f.write("#include <stdio.h>\n\nint main(void) {\n\treturn 0;\n}\n")
+                f.close()
+            if not os.path.exists("make.fmake"):
+                f = open("make.fmake","w")
+                f.write("cc $\nsrc = src/main.c\nout = build/main\nmsg $\nsay $\nrun = true\nmke = false\nmkf $\n")
+                f.close()
+        case "example":
+            f = open("make.fmake","w")
+            f.write("cc = gcc\nsrc = main.c\nout = main\nmsg = true\nsay = Compiling done!\nrun = false\nmkf = -j$(nproc)\n")
+            f.close()
+        case "help" | "--help" | "-h" | "-?":
+            print("Usage: fmake [keyword] [rule]")
+            print()
+            print("Keywords:")
+            print("rule    - Compiles a specific rule. To make a rule just make a <rule>.fmake file.")
+            print("clean   - Removes the compiled executable.")
+            print("debug   - Prints all the values of specific rule.")
+            print("example - Generates an example make.fmake file.")
+            print("project - Makes a build/ & src/ directory along with a custom make.fmake file.")
+            print("version - Returns the current version of fmake.")
+            print()
+            print("Note: Example, project, and version require no rule.")
+            print("Note: If no rule is passed to rule, clean, or debug it will default to make.fmake, if it exists.")
 
-elif len(sys.argv) == 2:
-    if sys.argv[0] == "debug":
-        setVar(libfmake.readConfig(sys.argv[1]))
-        debug()
+elif len(sys.argv) > 1:
+    if sys.argv[0] == "rule":
+        if os.path.exists(sys.argv[1] + ".fmake"):
+            vals = libfmake.readConfig(sys.argv[1] + ".fmake")
+            comp()
+        else:
+            print("[ERROR] No such rule exists.")
+            sys.exit()
+    elif sys.argv[0] == "debug":
+        if os.path.exists(sys.argv[1] + ".fmake"):
+            vals = libfmake.readConfig(sys.argv[1] + ".fmake")
+            debug()
+        else:
+            print("[ERROR] No such rule exists.")
     elif sys.argv[0] == "clean":
-        setVar(libfmake.readConfig(sys.argv[1]))
-        clean()
-    elif sys.argv[0] == "rule":
-        setVar(libfmake.readConfig(sys.argv[1]))
-        comp()
-elif len(sys.argv) == 0:
-    setVar(libfmake.readConfig("make.fmake"))
-    comp()
+        if os.path.exists(sys.argv[1] + ".fmake"):
+            vals = libfmake.readConfig(sys.argv[1] + ".fmake")
+            clean()
+        else:
+            print("[ERROR] No such rule exists.")
