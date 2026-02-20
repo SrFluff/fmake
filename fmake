@@ -1,5 +1,5 @@
 #!/bin/python3
-version = "1.5.2"
+version = "1.5.3"
 import os
 import libfmake
 import sys
@@ -15,6 +15,12 @@ say = vals[4]
 run = vals[5]
 mke = vals[6]
 mkf = vals[7]
+
+def lis():
+    a = os.listdir()
+    for i in a:
+        if len(i) > 7 and i[-6:] == ".fmake":
+            print(i[:-6])
 
 def comp():
     
@@ -72,8 +78,9 @@ elif len(sys.argv) == 1:
     if os.path.exists("make.fmake"):
         libfmake.readConfig("make.fmake")
     else:
-        print("[ERROR] No 'make.fmake' file.")
-        sys.exit()
+        if sys.argv[0] != "list":
+            print("[ERROR] No 'make.fmake' file.")
+            sys.exit()
     match sys.argv[0]:
         case "debug":
             debug()
@@ -81,6 +88,8 @@ elif len(sys.argv) == 1:
             clean()
         case "version":
             print(version)
+        case "list":
+            lis()
         case "project":
             if not os.path.exists("src/"):
                 os.mkdir("src")
@@ -107,9 +116,10 @@ elif len(sys.argv) == 1:
             print("debug   - Prints all the values of specific rule.")
             print("example - Generates an example make.fmake file.")
             print("project - Makes a build/ & src/ directory along with a custom make.fmake file.")
+            print("list    - Lists all available rules.")
             print("version - Returns the current version of fmake.")
             print()
-            print("Note: Example, project, and version require no rule.")
+            print("Note: Example, list, project, and version require no rule.")
             print("Note: If no rule is passed to rule, clean, or debug it will default to make.fmake, if it exists.")
 
 elif len(sys.argv) > 1:

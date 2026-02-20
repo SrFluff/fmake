@@ -71,7 +71,7 @@ MKF:    -j$(nproc)
 
 # Version
 
-Run `fmake --version`,`fmake -v`, or `fmake version` for the current version.
+Run `fmake version` for the current version.
 
 # Help
 
