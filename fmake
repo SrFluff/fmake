@@ -32,13 +32,14 @@ def comp():
     run = vals[5]
     mke = vals[6]
     mkf = vals[7]
-
     if not mke:
         os.system(f"{cc} -o {out} {src}")
     else:
         os.system(f"make {mkf}")
     if msg:
         print(say)
+    if run:
+        os.system(f"./{out}")
 
 def debug():
     cc = vals[0]
@@ -74,6 +75,7 @@ def clean():
 
 if len(sys.argv) == 0:
     vals = libfmake.readConfig("make.fmake")
+    comp()
 elif len(sys.argv) == 1:
     match sys.argv[0]:
         case "debug":
