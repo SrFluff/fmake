@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-version = "1.5.4"
+version = "1.6.4"
 import os
 import libfmake
 import sys
 sys.argv.pop(0)
 
-vals = ("gcc","main.c","main",True,"Compiling done!",False,False,"-j$(nproc)")
-
-cc = vals[0]
-src = vals[1]
-out = vals[2]
-msg = vals[3]
-say = vals[4]
-run = vals[5]
-mke = vals[6]
-mkf = vals[7]
+vals = {
+        "cc":"gcc",
+        "src":"main.c",
+        "out":"main",
+        "msg":True,
+        "say":"Compiling done!",
+        "run":False,
+        "mke":False,
+        "mkf":"-j$(nproc)"
+        }
 
 def lis():
     a = os.listdir()
@@ -24,75 +24,53 @@ def lis():
 
 def comp():
     
-    cc = vals[0]
-    src = vals[1]
-    out = vals[2]
-    msg = vals[3]
-    say = vals[4]
-    run = vals[5]
-    mke = vals[6]
-    mkf = vals[7]
-    if not mke:
-        os.system(f"{cc} -o {out} {src}")
+    if not vals["mke"]:
+        os.system(f"{vals['cc']} -o {vals['out']} {vals['src']}")
     else:
-        os.system(f"make {mkf}")
-    if msg:
-        print(say)
-    if run:
-        os.system(f"./{out}")
+        os.system(f"make {vals['mkf']}")
+    if vals["msg"]:
+        print(vals['say'])
+    if vals["run"]:
+        os.system(f"./{vals['out']}")
 
 def debug():
-    cc = vals[0]
-    src = vals[1]
-    out = vals[2]
-    msg = vals[3]
-    say = vals[4]
-    run = vals[5]
-    mke = vals[6]
-    mkf = vals[7]
-
-    print(f"CC:\t{cc}")
-    print(f"SRC:\t{src}")
-    print(f"OUT:\t{out}")
-    print(f"MSG:\t{msg}")
-    print(f"SAY:\t{say}")
-    print(f"RUN:\t{run}")
-    print(f"MKE:\t{mke}")
-    print(f"MKF:\t{mkf}")
+    for i in vals:
+        print(f"{i.upper()}:\t{vals[i]}")
 
 def clean():
-    cc = vals[0]
-    src = vals[1]
-    out = vals[2]
-    msg = vals[3]
-    say = vals[4]
-    run = vals[5]
-    mke = vals[6]
-    mkf = vals[7]
-
-    if os.path.exists(out):
-        os.remove(out)
+    if os.path.exists(vals["out"]):
+        os.remove(vals["out"])
 
 if len(sys.argv) == 0:
-    vals = libfmake.readConfig("make.fmake")
+    if not os.path.exists("make.fmake"):
+        print("fmake: No make.fmake file")
+        exit(1)
+    with open("make.fmake","r") as f:
+        vals = libfmake.loads(f.read())
+        f.close()
     comp()
+
 elif len(sys.argv) == 1:
     match sys.argv[0]:
         case "debug":
             if os.path.exists("make.fmake"):
-                libfmake.readConfig("make.fmake")
+                with open("make.fmake","r") as f:
+                    vals = libfmake.loads(f.read())
+                    f.close()
             else:
-                print("[ERROR] No 'make.fmake' file.")
-                sys.exit()
+                print("fmake: No make.fmake file")
+                exit(1)
             debug()
         case "clean":
             if os.path.exists("make.fmake"):
-                libfmake.readConfig("make.fmake")
+                with open("make.fmake","r") as f:
+                    vals = libfmake.loads(f.read())
+                    f.close()
             else:
-                print("[ERROR] No 'make.fmake' file.")
-                sys.exit()
+                print("fmake: No make.fmake file")
+                exit(1)
             clean()
-        case "version":
+        case "version" | "--version" | "-v":
             print(version)
         case "list":
             lis()
@@ -107,11 +85,11 @@ elif len(sys.argv) == 1:
                 f.close()
             if not os.path.exists("make.fmake"):
                 f = open("make.fmake","w")
-                f.write("cc $\nsrc = src/main.c\nout = build/main\nmsg $\nsay $\nrun = true\nmke = false\nmkf $\n")
+                f.write(libfmake.dumps({"cc":"gcc","src":"src/main.c","out":"build/main","mke":False,"run":False}))
                 f.close()
         case "example":
             f = open("make.fmake","w")
-            f.write("cc = gcc\nsrc = main.c\nout = main\nmsg = true\nsay = Compiling done!\nrun = false\nmkf = -j$(nproc)\n")
+            f.write(libfmake.dumps(vals))
             f.close()
         case "help" | "--help" | "-h" | "-?":
             print("Usage: fmake [keyword] [rule]")
@@ -131,20 +109,28 @@ elif len(sys.argv) == 1:
 elif len(sys.argv) > 1:
     if sys.argv[0] == "rule":
         if os.path.exists(sys.argv[1] + ".fmake"):
-            vals = libfmake.readConfig(sys.argv[1] + ".fmake")
+            with open(sys.argv[1] + ".fmake","r") as f:
+                vals = libfmake.loads(f.read())
+                f.close()
             comp()
         else:
-            print("[ERROR] No such rule exists.")
-            sys.exit()
+            print(f"fmake: '{sys.argv[1]}.fmake' does not exist")
+            exit(1)
     elif sys.argv[0] == "debug":
         if os.path.exists(sys.argv[1] + ".fmake"):
-            vals = libfmake.readConfig(sys.argv[1] + ".fmake")
+            with open(sys.argv[1] + ".fmake","r") as f:
+                vals = libfmake.loads(f.read())
+                f.close()
             debug()
         else:
-            print("[ERROR] No such rule exists.")
+            print(f"fmake: '{sys.argv[1]}.fmake' does not exist")
+            exit(1)
     elif sys.argv[0] == "clean":
         if os.path.exists(sys.argv[1] + ".fmake"):
-            vals = libfmake.readConfig(sys.argv[1] + ".fmake")
+            with open(sys.argv[1] + ".fmake","r") as f:
+                vals = libfmake.loads(f.read())
+                f.close()
             clean()
         else:
-            print("[ERROR] No such rule exists.")
+            print(f"fmake: '{sys.argv[1]}.fmake' does not exist")
+            exit(1)

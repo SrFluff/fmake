@@ -28,7 +28,7 @@ If you want to generate a new example config run `fmake example`.\
 \
 If you want to make a config file from scratch here's how to do that:\
 \
-`variable =/$ value(if applicable)`\
+`variable =/$ 'value(if applicable)'`\
 To set a variable to it's default value, write `variable $`.\
 \
 Here are the available variables
@@ -75,4 +75,4 @@ Run `fmake version` for the current version.
 
 # Help
 
-For more info run `fmake --help`, `fmake -?`, or `fmake -h`.
+For more info run `fmake help`, `fmake --help`, `fmake -?`, or `fmake -h`.

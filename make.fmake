@@ -1,8 +1,8 @@
-cc = gcc
-src = main.c
-out = main
+cc = 'gcc'
+src = 'main.c'
+out = 'main'
 msg = true
-say = Compiling done!
+say = 'Compiling done!'
 run = false
 mke = false
-mkf = -j$(nproc)
+mkf = '-j$(nproc)'
