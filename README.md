@@ -1,5 +1,5 @@
 # fmake
-A custom build utility, written in Python
+A custom build utility, written in Python\
 *NOTE: YOU NEED LIBFMAKE TO RUN THIS, DOWNLOAD IT [HERE](https://www.github.com/SrFluff/libfmake)*
 
 # Setup
